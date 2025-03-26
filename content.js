@@ -1,7 +1,9 @@
 async function clickOnButton() {
-    const avatarButton = document.querySelector("#idna-me-control-avatar-trigger")
+    const avatarButton = document.querySelector('#idna-me-control-avatar-trigger')
 
     if (avatarButton) {
+        if (!avatarButton.ariaLabel.includes('Away')) return;
+
         avatarButton.click();
         await timeout();
 
@@ -15,7 +17,7 @@ async function clickOnButton() {
 
         avatarButton.click();
     }
-    else console.log("Not logged in");
+    else console.log('Cannot find avatarButton');
 }
 
 setInterval(clickOnButton, 5000);
