@@ -16,6 +16,7 @@ async function clickOnButton() {
         await timeout();
 
         avatarButton.click();
+        console.log(new Date().toISOString().split('T').pop(), 'Status was changed');
     }
     else console.log('Cannot find avatarButton');
 }
