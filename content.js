@@ -28,8 +28,8 @@ function timeout(ms= 100) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-chrome.runtime.onMessage.addListener((message, sender) => {
-    console.log('message received from extension id:', sender.id, message);
+chrome.runtime.onMessage.addListener(message => {
+    console.log('message received from extension:', message);
     clearInterval(interval);
 
     if (message.extensionEnabled) interval = setInterval(clickOnAvatar, 5000);

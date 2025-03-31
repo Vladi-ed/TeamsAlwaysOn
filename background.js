@@ -1,28 +1,25 @@
 let extensionEnabled = true;
-const teamsUrl = 'https://teams.microsoft.com/v2';
+const teamsUrl = 'https://teams.microsoft.com/v2/';
+// https://developer.chrome.com/docs/extensions/reference/api/tabs
 
+chrome.action.onClicked.addListener(async (activeTab) => {
 
-chrome.action.onClicked.addListener(async (tab) => {
-    const teamsTabs = await chrome.tabs.query({ url: teamsUrl + '/*' });
-    if (teamsTabs.length === 0) {
-        await chrome.tabs.create({url: teamsUrl, active: true});
+    // if Teams tab is active
+    if (activeTab.url.startsWith(teamsUrl)) {
+        extensionEnabled = !extensionEnabled;
+
+        await chrome.tabs.sendMessage(activeTab.id, {extensionEnabled});
+
+        if (extensionEnabled) chrome.power.requestKeepAwake('system');
+        else chrome.power.releaseKeepAwake();
+
+        chrome.action.setIcon({ path: 'images/icon-128' + (extensionEnabled ? '' : '-disabled') + '.png' });
+        chrome.action.setTitle({ title: extensionEnabled ? 'Teams Always On - Enabled ' : 'Teams Always On - Disabled' });
     }
     else {
-        if (tab.url.startsWith(teamsUrl)) { // if tab is active
-            extensionEnabled = !extensionEnabled;
-
-            await chrome.tabs.sendMessage(tab.id, {extensionEnabled});
-
-            chrome.action.setIcon({
-                path: {
-                    38: 'images/icon-128' + (extensionEnabled ? '' : '-disabled') + '.png'
-                }
-            });
-            chrome.action.setTitle({ title: extensionEnabled ? 'Teams Always On - Enabled ' : 'Teams Always On - Disabled' });
-        }
-        else {
-            await chrome.tabs.update(teamsTabs[0].id, { active: true });
-        }
+        const teamsTabs = await chrome.tabs.query({ url: teamsUrl });
+        if (teamsTabs.length === 0) await chrome.tabs.create({url: teamsUrl, active: true});
+        else await chrome.tabs.update(teamsTabs[0].id, { active: true });
     }
 });
 
@@ -40,15 +37,12 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
     console.log(`Browser Platform: ${os} ${arch}`);
 
     if (reason === 'install' || reason === 'update') {
-        if (!chrome.contextMenus) return;
         chrome.contextMenus.create({
             id: 'reload',
             title: 'Reload Extension',
             visible: true,
             contexts: ['action']
         });
-
-        // if (chrome.contextMenus.onClicked.hasListeners()) return;
 
         chrome.contextMenus.onClicked.addListener(info => {
             console.log('Clicked on the context menu button');

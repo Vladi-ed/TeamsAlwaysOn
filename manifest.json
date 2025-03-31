@@ -10,11 +10,11 @@
     {
       "js": ["content.js"],
       "matches": [
-        "https://*.teams.microsoft.com/*"
+        "https://teams.microsoft.com/v2/*"
       ]
     }
   ],
-  "permissions": ["power", "alarms", "contextMenus"],
+  "permissions": ["power", "contextMenus", "activeTab"],
   "background": {
     "service_worker": "background.js"
   },
