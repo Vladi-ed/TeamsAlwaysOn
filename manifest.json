@@ -3,6 +3,9 @@
   "name": "Teams Always On",
   "description": "Made by Vladi",
   "version": "1.0",
+  "action": {
+    "default_title": "Teams Always On"
+  },
   "content_scripts": [
     {
       "js": ["content.js"],
@@ -11,6 +14,10 @@
       ]
     }
   ],
+  "permissions": ["power", "alarms", "contextMenus"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "icons": {
     "128": "images/icon-128.png"
   }

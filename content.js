@@ -1,4 +1,7 @@
-async function clickOnButton() {
+let interval = setInterval(clickOnAvatar, 5000);
+
+async function clickOnAvatar() {
+    console.log('clickOnAvatar()');
     const avatarButton = document.querySelector('#idna-me-control-avatar-trigger')
 
     if (avatarButton) {
@@ -21,8 +24,13 @@ async function clickOnButton() {
     else console.log('Cannot find avatarButton');
 }
 
-setInterval(clickOnButton, 5000);
-
 function timeout(ms= 100) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+chrome.runtime.onMessage.addListener((message, sender) => {
+    console.log('message received from extension id:', sender.id, message);
+    clearInterval(interval);
+
+    if (message.extensionEnabled) interval = setInterval(clickOnAvatar, 5000);
+});
