@@ -19,7 +19,7 @@ async function clickOnAvatar() {
         await timeout();
 
         avatarButton.click();
-        console.log(new Date().toISOString().split('T').pop(), 'Status was changed');
+        console.log(new Date().toLocaleTimeString(), 'Status was changed');
     }
     else console.log('Cannot find avatarButton');
 }
@@ -33,4 +33,12 @@ chrome.runtime.onMessage.addListener(message => {
     clearInterval(interval);
 
     if (message.extensionEnabled) interval = setInterval(clickOnAvatar, 5000);
+});
+
+document.addEventListener("visibilitychange", (ev) => {
+    if (document.hidden) {
+        console.log(new Date().toLocaleTimeString(), 'Document was hidden', ev);
+    } else {
+        console.log(new Date().toLocaleTimeString(), 'Document is visible', ev);
+    }
 });

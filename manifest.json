@@ -14,7 +14,10 @@
       ]
     }
   ],
-  "permissions": ["power", "contextMenus", "activeTab"],
+  "host_permissions": [
+    "https://teams.microsoft.com/*"
+  ],
+  "permissions": ["power", "contextMenus", "activeTab", "alarms"],
   "background": {
     "service_worker": "background.js"
   },
