@@ -1,7 +1,7 @@
 let interval = setInterval(clickOnAvatar, 5000);
 
 async function clickOnAvatar() {
-    console.log('clickOnAvatar()');
+    console.log(new Date().toLocaleTimeString(), 'clickOnAvatar()');
     const avatarButton = document.querySelector('#idna-me-control-avatar-trigger')
 
     if (avatarButton) {
@@ -35,10 +35,10 @@ chrome.runtime.onMessage.addListener(message => {
     if (message.extensionEnabled) interval = setInterval(clickOnAvatar, 5000);
 });
 
-document.addEventListener("visibilitychange", (ev) => {
+document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
-        console.log(new Date().toLocaleTimeString(), 'Document was hidden', ev);
+        console.log(new Date().toLocaleTimeString(), 'Document was hidden');
     } else {
-        console.log(new Date().toLocaleTimeString(), 'Document is visible', ev);
+        console.log(new Date().toLocaleTimeString(), 'Document is visible');
     }
 });
