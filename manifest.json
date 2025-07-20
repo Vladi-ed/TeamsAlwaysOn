@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Teams Always On",
   "description": "Made by Vladi",
-  "version": "1.0",
+  "version": "1.1",
   "action": {
     "default_title": "Teams Always On"
   },
@@ -15,7 +15,7 @@
     }
   ],
   "host_permissions": [
-    "https://teams.microsoft.com/*"
+    "https://teams.microsoft.com/v2/*"
   ],
   "permissions": ["power", "contextMenus", "activeTab", "alarms"],
   "background": {

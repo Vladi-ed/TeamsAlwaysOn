@@ -16,17 +16,15 @@ chrome.runtime.onInstalled.addListener(async ({reason}) => {
     const {os, arch} = await chrome.runtime.getPlatformInfo();
     console.log(`Browser Platform: ${os} ${arch}`);
 
-    if (reason === 'install' || reason === 'update') {
-        chrome.contextMenus.create({
-            id: 'reload', title: 'Reload Extension', visible: true, contexts: ['action']
-        });
+    const alarm = await chrome.alarms.get('wakeup-alarm');
+    if (!alarm) await chrome.alarms.create('wakeup-alarm', {
+        delayInMinutes: 2,
+        periodInMinutes: 2
+    });
 
-        const alarm = await chrome.alarms.get('wakeup-alarm');
-        if (!alarm) await chrome.alarms.create('wakeup-alarm', {
-            delayInMinutes: 2,
-            periodInMinutes: 2
-        });
-    }
+    chrome.contextMenus.create({
+        id: 'reload', title: 'Reload Extension', visible: true, contexts: ['action']
+    });
 });
 
 async function enableDisableContentScript(tabId) {
@@ -48,12 +46,12 @@ async function enableDisableContentScript(tabId) {
 }
 
 async function openTeamsTab() {
-    const teamsTabs = await chrome.tabs.query({url: teamsUrl});
-    if (teamsTabs.length === 0) await chrome.tabs.create({
+    const teamsTabs = await chrome.tabs.query({url: teamsUrl + '*'});
+    if (teamsTabs.length) await chrome.tabs.update(teamsTabs[0].id, {active: true});
+    else await chrome.tabs.create({
         url: teamsUrl,
         active: true
     });
-    else await chrome.tabs.update(teamsTabs[0].id, {active: true});
 }
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
@@ -68,8 +66,10 @@ chrome.contextMenus.onClicked.addListener(async info => {
     if (info.menuItemId !== 'reload') return;
 
     console.log('Clicked on the context menu button');
-    const tabs = await chrome.tabs.query({url: teamsUrl})
-    if (tabs.length > 0) tabs.forEach((tab, index) => {
+    const tabs = await chrome.tabs.query({url: teamsUrl + '*'});
+    console.log('Tabs', tabs[0]?.url);
+
+    tabs.forEach((tab, index) => {
         if (index === 0) chrome.tabs.update(tab.id, { active: true, url: tabs[0].url });
         else chrome.tabs.remove(tab.id);
     })
