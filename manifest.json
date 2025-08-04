@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Teams Always On",
   "description": "Switches the Teams Web status to Available",
-  "version": "1.2",
+  "version": "1.3",
   "action": {
     "default_title": "Teams Always On"
   },
@@ -21,6 +21,7 @@
   "background": {
     "service_worker": "background.js"
   },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr0CKpSpgtMzfbCXNbkBFczz1MV5j1wycoIRIb24r4otqwhhzwaFJQonJEn+MJZxrHs7zOkd5fQtRYZrnG3RF+jeSeg7wcmW34DkrCBWqkVKC2ispKPvPtTSbwwga1Da5uEsaBdDDa7G+aB5LBBAefIMQg2X31D2ZHtQ5PzLpqSp/77GUPg14TB7u8nU/cB+tUrn/fnnwxH+H+3WCs6b1+MSkxOO7H85xlMnbKPylRgB7F0W0JzLwQeS83VzRLw2Uw/lsG9cQLv3QaXM1VH/XOZTQIFsewDUWqmw6YTsMIP687LoVyovm0l7xnVEDc9cu464Zyuy28D6aQfSnrryfAQIDAQAB",
   "icons": {
     "128": "images/icon-128.png"
   }
