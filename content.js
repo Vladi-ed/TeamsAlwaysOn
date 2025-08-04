@@ -1,7 +1,7 @@
 let interval = setInterval(clickOnAvatar, 5000);
 
 async function clickOnAvatar() {
-    console.log(new Date().toLocaleTimeString(), 'clickOnAvatar()');
+    console.debug(new Date().toLocaleTimeString(), 'Check the status');
     const avatarButton = document.querySelector('#idna-me-control-avatar-trigger')
 
     if (avatarButton) {
@@ -19,9 +19,9 @@ async function clickOnAvatar() {
         await timeout();
 
         avatarButton.click();
-        console.log(new Date().toLocaleTimeString(), 'Status was changed');
+        console.log(new Date().toLocaleTimeString(), 'Status was changed from Away to Available');
     }
-    else console.log('Cannot find avatarButton');
+    else console.warn('Cannot find avatarButton');
 }
 
 function timeout(ms= 100) {
@@ -29,7 +29,7 @@ function timeout(ms= 100) {
 }
 
 chrome.runtime.onMessage.addListener(message => {
-    console.log('message received from extension:', message);
+    console.log(new Date().toLocaleTimeString(), 'Message from the extension:', message);
     clearInterval(interval);
 
     if (message.extensionEnabled) interval = setInterval(clickOnAvatar, 5000);
@@ -37,8 +37,8 @@ chrome.runtime.onMessage.addListener(message => {
 
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
-        console.log(new Date().toLocaleTimeString(), 'Document was hidden');
+        console.log(new Date().toLocaleTimeString(), 'Teams page was hidden');
     } else {
-        console.log(new Date().toLocaleTimeString(), 'Document is visible');
+        console.log(new Date().toLocaleTimeString(), 'Teams page is visible');
     }
 });
