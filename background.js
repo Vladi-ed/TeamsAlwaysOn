@@ -22,6 +22,7 @@ chrome.runtime.onInstalled.addListener(async ({reason}) => {
         periodInMinutes: 2
     });
 
+    await chrome.contextMenus.removeAll();
     chrome.contextMenus.create({
         id: 'reload', title: 'Reload Extension', visible: true, contexts: ['action']
     });
