@@ -28,6 +28,17 @@ chrome.runtime.onInstalled.addListener(async ({reason}) => {
     });
 });
 
+// when the browser starts up
+chrome.runtime.onStartup.addListener(async () => {
+    console.log('Teams Always On extension started');
+
+    const alarm = await chrome.alarms.get('wakeup-alarm');
+    if (!alarm) await chrome.alarms.create('wakeup-alarm', {
+        delayInMinutes: 2,
+        periodInMinutes: 2
+    });
+});
+
 async function enableDisableContentScript(tabId) {
     extensionEnabled = !extensionEnabled;
 

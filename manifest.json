@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Teams Always On",
   "description": "Switches the Teams Web status to Available",
-  "version": "1.3",
+  "version": "1.4",
   "action": {
     "default_title": "Teams Always On"
   },
