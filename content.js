@@ -21,7 +21,7 @@ async function clickOnAvatar() {
         avatarButton.click();
         console.log(new Date().toLocaleTimeString(), 'Status was changed from Away to Available');
     }
-    else console.warn('Cannot find avatarButton');
+    else console.warn('clickOnAvatar() - Cannot find avatarButton ' + new Date().toLocaleTimeString());
 }
 
 function timeout(ms= 100) {
