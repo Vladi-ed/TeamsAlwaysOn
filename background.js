@@ -2,25 +2,16 @@ let extensionEnabled = true;
 const teamsUrl = 'https://teams.microsoft.com/v2/';
 // https://developer.chrome.com/docs/extensions/reference/api/tabs
 
-chrome.action.onClicked.addListener(activeTab => {
-    // if Teams tab is active
-    if (activeTab.url.startsWith(teamsUrl)) {
-        enableDisableContentScript(activeTab.id);
-    } else {
-        openTeamsTab();
-    }
+// when the browser starts up
+chrome.runtime.onStartup.addListener(async () => {
+    const alarm = await chrome.alarms.get('wakeup-alarm');
+    console.log('Teams Always On extension started', alarm);
 });
 
 chrome.runtime.onInstalled.addListener(async ({reason}) => {
     console.log('Teams Always On extension ' + reason);
-    const {os, arch} = await chrome.runtime.getPlatformInfo();
-    console.log(`Browser Platform: ${os} ${arch}`);
-
     const alarm = await chrome.alarms.get('wakeup-alarm');
-    if (!alarm) await chrome.alarms.create('wakeup-alarm', {
-        delayInMinutes: 2,
-        periodInMinutes: 2
-    });
+    console.log('Alarm timer', alarm);
 
     await chrome.contextMenus.removeAll();
     chrome.contextMenus.create({
@@ -28,43 +19,35 @@ chrome.runtime.onInstalled.addListener(async ({reason}) => {
     });
 });
 
-// when the browser starts up
-chrome.runtime.onStartup.addListener(async () => {
-    console.log('Teams Always On extension started');
-
-    const alarm = await chrome.alarms.get('wakeup-alarm');
-    if (!alarm) await chrome.alarms.create('wakeup-alarm', {
-        delayInMinutes: 2,
-        periodInMinutes: 2
-    });
-});
-
-async function enableDisableContentScript(tabId) {
-    extensionEnabled = !extensionEnabled;
-
-    try {
-        await chrome.tabs.sendMessage(tabId, {extensionEnabled});
-    } catch (e) {
-        chrome.tabs.reload(tabId);
-        extensionEnabled = !extensionEnabled;
-        return;
+chrome.action.onClicked.addListener(async (activeTab) => {
+    // if Teams tab is active
+    if (activeTab.url.startsWith(teamsUrl)) {
+        await enableDisableContentScript(activeTab.id);
+    } else {
+        await openTeamsTab();
     }
 
-    if (extensionEnabled) chrome.power.requestKeepAwake('system');
-    else chrome.power.releaseKeepAwake();
+    const alarm = await chrome.alarms.get('wakeup-alarm');
+    console.log('Alarm timer before', alarm);
 
-    chrome.action.setIcon({path: 'images/icon-128' + (extensionEnabled ? '' : '-disabled') + '.png'});
-    chrome.action.setTitle({title: extensionEnabled ? 'Teams Always On - Enabled ' : 'Teams Always On - Disabled'});
-}
+    if (extensionEnabled) {
 
-async function openTeamsTab() {
-    const teamsTabs = await chrome.tabs.query({url: teamsUrl + '*'});
-    if (teamsTabs.length) await chrome.tabs.update(teamsTabs[0].id, {active: true});
-    else await chrome.tabs.create({
-        url: teamsUrl,
-        active: true
-    });
-}
+        if (!alarm) await chrome.alarms.create('wakeup-alarm', {
+            delayInMinutes: 2,
+            periodInMinutes: 2
+        });
+
+        chrome.power.requestKeepAwake('system');
+    }
+    else {
+        chrome.power.releaseKeepAwake();
+        await chrome.alarms.clearAll();
+    }
+
+    const alarm2 = await chrome.alarms.get('wakeup-alarm');
+    console.log('Alarm timer after', alarm2);
+
+});
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
     if (extensionEnabled && alarm.name) {
@@ -74,6 +57,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     }
 });
 
+// on click 'Reload Extension'
 chrome.contextMenus.onClicked.addListener(async info => {
     if (info.menuItemId !== 'reload') return;
 
@@ -88,3 +72,28 @@ chrome.contextMenus.onClicked.addListener(async info => {
 
     chrome.runtime.reload();
 });
+
+async function enableDisableContentScript(tabId) {
+    extensionEnabled = !extensionEnabled;
+
+    try {
+        await chrome.tabs.sendMessage(tabId, {extensionEnabled});
+    } catch (e) {
+        console.log('Error sending message to tab id:', tabId, e);
+        await chrome.tabs.reload(tabId);
+        extensionEnabled = !extensionEnabled;
+        return;
+    }
+
+    await chrome.action.setIcon({path: 'images/icon-128' + (extensionEnabled ? '' : '-disabled') + '.png'});
+    await chrome.action.setTitle({title: extensionEnabled ? 'Teams Always On - Enabled ' : 'Teams Always On - Disabled'});
+}
+
+async function openTeamsTab() {
+    const teamsTabs = await chrome.tabs.query({url: teamsUrl + '*'});
+    if (teamsTabs.length) await chrome.tabs.update(teamsTabs[0].id, {active: true});
+    else await chrome.tabs.create({
+        url: teamsUrl,
+        active: true
+    });
+}
