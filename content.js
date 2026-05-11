@@ -1,4 +1,4 @@
-let interval = setInterval(clickOnAvatar, 5000);
+let interval;
 
 async function clickOnAvatar() {
     console.debug(new Date().toLocaleTimeString(), 'Check the status');
@@ -28,12 +28,27 @@ function timeout(ms= 100) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-chrome.runtime.onMessage.addListener(message => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log(new Date().toLocaleTimeString(), 'Message from the extension:', message);
-    clearInterval(interval);
 
-    if (message.extensionEnabled) interval = setInterval(clickOnAvatar, 5000);
+    if (message.extensionEnabled) startCheckingStatus();
+    else stopCheckingStatus();
+
+    sendResponse?.({extensionEnabled: Boolean(interval)});
 });
+
+function startCheckingStatus() {
+    stopCheckingStatus();
+    clickOnAvatar();
+    interval = setInterval(clickOnAvatar, 5000);
+}
+
+function stopCheckingStatus() {
+    if (!interval) return;
+
+    clearInterval(interval);
+    interval = undefined;
+}
 
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {

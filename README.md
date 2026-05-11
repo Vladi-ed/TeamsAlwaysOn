@@ -20,9 +20,11 @@ The extension is implemented as a Manifest V3 extension with a background servic
 4. Choose `Load unpacked`.
 5. Select the repository root directory containing `manifest.json`.
 6. Open or sign in to Microsoft Teams at `https://teams.microsoft.com/v2/`.
-7. Click the `Teams Always On` extension action:
-   - If a Teams tab is active, the extension toggles the content script behavior on or off.
-   - If another tab is active, the extension opens or focuses Teams.
+7. Use the `Teams Always On` extension action:
+   - On browser startup or extension install/update, the extension tries to enable itself by sending an enable message to the first available Teams tab.
+   - If the first Teams tab responds, the extension starts its keep-awake behavior and shows the enabled icon/title.
+   - If there is no Teams tab or communication fails, the extension stays disabled and shows the disabled icon/title.
+   - Clicking the action on a Teams tab toggles the first available Teams tab on or off; clicking it elsewhere opens or focuses Teams.
 
 ## Scripts
 
@@ -31,15 +33,23 @@ This repository does not currently include a package manifest such as `package.j
 
 ## Tests
 
-No automated test framework or test command is currently present in the repository.
+The repository includes a small Node.js test suite that mocks the Chrome extension APIs and verifies the enable/disable lifecycle.
+
+Run the tests with:
+
+```shell
+node --test tests/extension-lifecycle.test.js
+```
 
 Suggested manual checks:
 
 1. Load the unpacked extension in a Chromium-based browser.
 2. Open `https://teams.microsoft.com/v2/` and sign in.
 3. Confirm the extension action opens or focuses the Teams tab.
-4. Confirm clicking the extension action on a Teams tab toggles the extension icon/title between enabled and disabled states.
-5. When Teams shows the user as `Away`, confirm the content script can open the presence menu and choose `Available`.
+4. Confirm the extension enables on startup/install only when it can communicate with the first available Teams tab.
+5. Confirm clicking the extension action on a Teams tab toggles the extension icon/title between enabled and disabled states.
+6. Confirm the extension returns to disabled when the Teams tab is closed or extension-to-tab communication fails.
+7. When Teams shows the user as `Away`, confirm the content script can open the presence menu and choose `Available`.
 
 
 ## Project structure
@@ -59,7 +69,7 @@ Suggested manual checks:
 ## Entry points
 
 - `manifest.json` declares the extension metadata, permissions, content script, icons, and Manifest V3 background service worker.
-- `background.js` handles extension startup/install events, action button clicks, alarms, keep-awake behavior, context menu reload behavior, and Teams tab focusing/opening.
+- `background.js` handles extension startup/install events, action button clicks, alarms, keep-awake behavior, context menu reload behavior, and Teams tab focusing/opening. It keeps state in memory only and communicates with the first available Teams tab.
 - `content.js` runs on Teams web pages and periodically checks whether the Teams presence label includes `Away`; when it does, it attempts to select `Available` from the Teams presence menu.
 
 ## Permissions and host access
@@ -70,7 +80,6 @@ The extension declares these Chrome extension permissions:
 - `contextMenus`
 - `activeTab`
 - `alarms`
-
 It also declares host access for:
 
 - `https://teams.microsoft.com/v2/*`

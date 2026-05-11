@@ -2,9 +2,10 @@
   "manifest_version": 3,
   "name": "Teams Always On",
   "description": "Switches the Teams Web status to Available",
-  "version": "1.4",
+  "version": "2.0",
   "action": {
-    "default_title": "Teams Always On"
+    "default_icon": "images/icon-128-disabled.png",
+    "default_title": "Teams Always On - Click to open Teams"
   },
   "content_scripts": [
     {
@@ -17,7 +18,7 @@
   "host_permissions": [
     "https://teams.microsoft.com/v2/*"
   ],
-  "permissions": ["power", "contextMenus", "activeTab", "alarms"],
+  "permissions": ["power", "contextMenus", "alarms"],
   "background": {
     "service_worker": "background.js"
   },
